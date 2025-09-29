@@ -47,11 +47,11 @@ const Dashboard = () => {
           purchaseOrderDetailsRes,
           invProductsRes,
         ] = await Promise.all([
-          axios.get("${URL}/api/employee", { headers }),
-          axios.get("${URL}/api/organization", { headers }),
-          axios.get("${URL}/api/purchaseorder", { headers }),
-          axios.get("${URL}/api/purchaseorderdetail", { headers }),
-          axios.get("${URL}/api/invproduct", { headers }),
+          axios.get(`${URL}/api/employee`, { headers }),
+          axios.get(`${URL}/api/organization`, { headers }),
+          axios.get(`${URL}/api/purchaseorder`, { headers }),
+          axios.get(`${URL}/api/purchaseorderdetail`, { headers }),
+          axios.get(`${URL}/api/invproduct`, { headers }),
         ]);
 
         setTotals({
