@@ -2,110 +2,109 @@ const User = require("../Models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// Sign Up
 const signUp = async (req, res) => {
   const { name, email, password } = req.body;
 
+  // Validate input
   if (!name || !email || !password) {
     return res.status(400).json({ error: "All fields are required" });
   }
 
   try {
+    // Check if the user already exists
     const userExists = await User.findOne({ where: { email } });
     if (userExists) {
       return res.status(400).json({ error: "Email already in use" });
     }
 
-    // ✅ Hash password before saving
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Create a new user
+    const newUser = await User.create({ name, email, password });
 
-    const newUser = await User.create({ 
-      name, 
-      email, 
-      password: hashedPassword 
-    });
-
-    res.status(201).json({ 
-      message: "User created successfully", 
-      user: { id: newUser.id, name: newUser.name, email: newUser.email }
-    });
+    // Send response
+    res
+      .status(201)
+      .json({ message: "User created successfully", user: newUser });
   } catch (error) {
-    console.error("Signup error:", error);
+    console.error(error);
     res.status(500).json({ error: "Something went wrong" });
   }
 };
 
-// Login
+// Login function
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ error: "Email and Password are required" });
-  }
-
-  try {
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      return res.status(400).json({ error: "Invalid email or password" });
+    const { email, password } = req.body;
+  
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and Password are required" });
     }
-
-    // ✅ Compare hashed password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ error: "Invalid email or password" });
+  
+    try {
+      // Find the user by email
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        return res.status(400).json({ error: "Invalid email or password" });
+      }
+  
+      // Compare the password with the hashed password in the database
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ error: "Invalid email or password" });
+      }
+  
+      // JWT secret
+      const token = jwt.sign(
+        { id: user.id, name: user.name, email: user.email },
+        "secret-key",
+      );
+  
+      // Send the response with the token
+      res.status(200).json({ message: "Login successful", token });
+    } catch (error) {
+      console.error("Error during login:", error);
+      res.status(500).json({ error: "Something went wrong during login" });
     }
+  };
 
-    // ✅ Use secret from environment variable
-    const token = jwt.sign(
-      { id: user.id, name: user.name, email: user.email },
-      process.env.JWT_SECRET || "fallback-secret",
-      { expiresIn: "1d" }
-    );
-
-    res.status(200).json({ message: "Login successful", token });
-  } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).json({ error: "Something went wrong during login" });
-  }
-};
-
-// Verify JWT
+  // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
-  const token = req.headers["authorization"]?.split(" ")[1];
+  const token = req.headers["authorization"]?.split(" ")[1]; // Extract the token from Authorization header
 
   if (!token) {
     return res.status(403).json({ error: "No token provided" });
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback-secret");
+    const decoded = jwt.verify(token, "secret-key"); // Verify the token
     req.user = decoded;
     next();
   } catch (error) {
-    console.error("JWT error:", error);
+    console.error(error);
     return res.status(401).json({ error: "Invalid or expired token" });
   }
 };
 
-// Get user data
+// get logged-in user's data
 const getUserData = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.id);
+    const userId = req.user.id; // Get the user ID from the verified token
+    const user = await User.findByPk(userId); // Find the user by ID
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
+    // Send user data
     res.status(200).json({
       id: user.id,
       name: user.name,
       email: user.email,
-      created_at: user.createdAt, // Sequelize usually uses createdAt
+      created_at: user.created_at,
     });
   } catch (error) {
-    console.error("Get user error:", error);
+    console.error(error);
     res.status(500).json({ error: "Something went wrong" });
   }
 };
+  
 
 module.exports = { signUp, loginUser, verifyToken, getUserData };
