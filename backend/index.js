@@ -14,30 +14,11 @@ const InvProductController = require('./Controllers/invProductController');
 const app = express();
 
 // Middleware
-// app.use(cors({ 
-//   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-//   credentials: true
-// }));
-// app.use(express.json());
-
-const allowedOrigins = [
-  process.env.FRONTEND_URL,   // https://salesforce.vercel.app
-  'http://localhost:3000'     // local dev
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // allow requests with no origin (like mobile apps, curl)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error('Not allowed by CORS'));
-    }
-  },
+app.use(cors({ 
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
 }));
-
+app.use(express.json());
 
 
 // User routes
