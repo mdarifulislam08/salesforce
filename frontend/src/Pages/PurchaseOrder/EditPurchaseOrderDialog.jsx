@@ -136,7 +136,7 @@ const EditPurchaseOrderDialog = ({
       }
 
       try {
-        const response = await axios.get("${URL}/api/organization/search", {
+        const response = await axios.get(`${URL}/api/organization/search`, {
           params: { query: debouncedVendorSearch },
           headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
         });
@@ -159,7 +159,7 @@ const EditPurchaseOrderDialog = ({
       }
 
       try {
-        const response = await axios.get("${URL}/api/organization/search", {
+        const response = await axios.get(`${URL}/api/organization/search`, {
           params: { query: debouncedStoreSearch },
           headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
         });
