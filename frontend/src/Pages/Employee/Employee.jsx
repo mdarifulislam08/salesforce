@@ -104,7 +104,7 @@ const Employees = () => {
     const fetchEmployees = async () => {
       setLoading(true);
       try {
-        const response = await axios.get("${URL}/api/employee", {
+        const response = await axios.get(`${URL}/api/employee`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
@@ -134,21 +134,24 @@ const Employees = () => {
   };
 
   // Compute department
-  const departmentData = employees.reduce((acc, emp) => {
-    if (emp.department) {
-      const existing = acc.find((d) => d.name === emp.department);
-      if (existing) {
-        existing.count += 1;
-      } else {
-        acc.push({
-          name: emp.department,
-          count: 1,
-          color: getDepartmentColor(emp.department),
-        });
+  const departmentData = Array.isArray(employees)
+  ? employees.reduce((acc, emp) => {
+      if (emp.department) {
+        const existing = acc.find((d) => d.name === emp.department);
+        if (existing) {
+          existing.count += 1;
+        } else {
+          acc.push({
+            name: emp.department,
+            count: 1,
+            color: getDepartmentColor(emp.department),
+          });
+        }
       }
-    }
-    return acc;
-  }, []);
+      return acc;
+    }, [])
+  : [];
+
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -290,7 +293,7 @@ const Employees = () => {
         );
       } else {
         const response = await axios.post(
-          "${URL}/api/employee",
+          `${URL}/api/employee`,
           payload,
           {
             headers: {
