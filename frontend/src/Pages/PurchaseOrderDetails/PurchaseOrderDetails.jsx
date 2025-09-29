@@ -87,13 +87,13 @@ const PurchaseOrderDetails = () => {
       setLoading(true);
       try {
         const [podResponse, poResponse, productResponse] = await Promise.all([
-          axios.get("${URL}/api/purchaseorderdetail", {
+          axios.get(`${URL}/api/purchaseorderdetail`, {
             headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
           }),
-          axios.get("${URL}/api/purchaseorder", {
+          axios.get(`${URL}/api/purchaseorder`, {
             headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
           }),
-          axios.get("${URL}/api/invproduct", {
+          axios.get(`${URL}/api/invproduct`, {
             headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
           }),
         ]);
@@ -296,7 +296,7 @@ const PurchaseOrderDetails = () => {
         );
       } else {
         const response = await axios.post(
-          "${URL}/api/purchaseorderdetail",
+          `${URL}/api/purchaseorderdetail`,
           payload,
           {
             headers: {
