@@ -25,8 +25,8 @@ import {
   Checkbox,
   FormControlLabel,
   CircularProgress,
-  useTheme,               
-  useMediaQuery, 
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import {
   Search as SearchIcon,
@@ -40,7 +40,6 @@ import axios from "axios";
 import { URL } from "../../config";
 import Sidebar from "../../Components/Sidebar/Sidebar";
 
-
 const stringToColor = (string) => {
   let hash = 0;
   for (let i = 0; i < string.length; i++) {
@@ -51,7 +50,7 @@ const stringToColor = (string) => {
 };
 
 const InvProducts = () => {
-  const theme = useTheme();                                      
+  const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [products, setProducts] = useState([]);
@@ -80,7 +79,7 @@ const InvProducts = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const response = await axios.get("${URL}/api/invproduct", {
+        const response = await axios.get(`${URL}/api/invproduct`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
@@ -113,20 +112,22 @@ const InvProducts = () => {
   };
 
   // Compute category
-  const categoryData = products.reduce((acc, product) => {
-    const category = product.product_category || "Uncategorized";
-    const existing = acc.find((d) => d.name === category);
-    if (existing) {
-      existing.count += 1;
-    } else {
-      acc.push({
-        name: category,
-        count: 1,
-        color: getCategoryColor(category),
-      });
-    }
-    return acc;
-  }, []);
+  const categoryData = Array.isArray(products)
+    ? products.reduce((acc, product) => {
+        const category = product.product_category || "Uncategorized";
+        const existing = acc.find((d) => d.name === category);
+        if (existing) {
+          existing.count += 1;
+        } else {
+          acc.push({
+            name: category,
+            count: 1,
+            color: getCategoryColor(category),
+          });
+        }
+        return acc;
+      }, [])
+    : [];
 
   // Validate form for disabling Add/Update button
   const isFormValid = () => {
@@ -202,7 +203,10 @@ const InvProducts = () => {
         setError(null);
       } catch (err) {
         console.error("Error deleting product:", err);
-        setError("Failed to delete product: " + (err.response?.data?.error || err.message));
+        setError(
+          "Failed to delete product: " +
+            (err.response?.data?.error || err.message)
+        );
       }
     }
   };
@@ -246,26 +250,29 @@ const InvProducts = () => {
         );
         setProducts(
           products.map((product) =>
-            product.id === currentProduct.id ? response.data.invProduct : product
+            product.id === currentProduct.id
+              ? response.data.invProduct
+              : product
           )
         );
       } else {
-        const response = await axios.post(
-          "${URL}/api/invproduct",
-          payload,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
-        );
+        const response = await axios.post(`${URL}/api/invproduct`, payload, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
         setProducts([...products, response.data.invProduct]);
       }
       setOpenModal(false);
       setError(null);
     } catch (err) {
       console.error("Error saving product:", err);
-      setError("Failed to " + (isEdit ? "update" : "create") + " product: " + (err.response?.data?.error || err.message));
+      setError(
+        "Failed to " +
+          (isEdit ? "update" : "create") +
+          " product: " +
+          (err.response?.data?.error || err.message)
+      );
     }
   };
 
@@ -317,7 +324,10 @@ const InvProducts = () => {
 
         {/* Error Message */}
         {error && (
-          <Typography color="error" sx={{ mb: 2, fontFamily: "'Inter', sans-serif" }}>
+          <Typography
+            color="error"
+            sx={{ mb: 2, fontFamily: "'Inter', sans-serif" }}
+          >
             {error}
           </Typography>
         )}
@@ -325,7 +335,7 @@ const InvProducts = () => {
         {/* Loading State */}
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-            <CircularProgress size={isMobile ? 24 : 40}/>
+            <CircularProgress size={isMobile ? 24 : 40} />
           </Box>
         ) : (
           <>
@@ -393,7 +403,13 @@ const InvProducts = () => {
                 ))}
               </Grid>
             ) : (
-              <Typography sx={{ mb: 4, fontFamily: "'Inter', sans-serif", color: "#6B7280" }}>
+              <Typography
+                sx={{
+                  mb: 4,
+                  fontFamily: "'Inter', sans-serif",
+                  color: "#6B7280",
+                }}
+              >
                 No product categories available
               </Typography>
             )}
@@ -460,31 +476,129 @@ const InvProducts = () => {
                 <Table stickyHeader>
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 600, backgroundColor: "#FAFAFA", fontFamily: "'Inter', sans-serif" }}>Code</TableCell>
-                      <TableCell sx={{ fontWeight: 600, backgroundColor: "#FAFAFA", fontFamily: "'Inter', sans-serif" }}>Alternate Code</TableCell>
-                      <TableCell sx={{ fontWeight: 600, backgroundColor: "#FAFAFA", fontFamily: "'Inter', sans-serif" }}>Name</TableCell>
-                      <TableCell sx={{ fontWeight: 600, backgroundColor: "#FAFAFA", fontFamily: "'Inter', sans-serif" }}>Description</TableCell>
-                      <TableCell sx={{ fontWeight: 600, backgroundColor: "#FAFAFA", fontFamily: "'Inter', sans-serif" }}>UOM</TableCell>
-                      <TableCell sx={{ fontWeight: 600, backgroundColor: "#FAFAFA", fontFamily: "'Inter', sans-serif" }}>Product Type</TableCell>
-                      <TableCell sx={{ fontWeight: 600, backgroundColor: "#FAFAFA", fontFamily: "'Inter', sans-serif" }}>Category</TableCell>
-                      <TableCell sx={{ fontWeight: 600, backgroundColor: "#FAFAFA", fontFamily: "'Inter', sans-serif" }}>Brand</TableCell>
-                      <TableCell sx={{ fontWeight: 600, backgroundColor: "#FAFAFA", fontFamily: "'Inter', sans-serif" }}>Has Serial</TableCell>
-                      <TableCell sx={{ fontWeight: 600, backgroundColor: "#FAFAFA", fontFamily: "'Inter', sans-serif" }}>Actions</TableCell>
+                      <TableCell
+                        sx={{
+                          fontWeight: 600,
+                          backgroundColor: "#FAFAFA",
+                          fontFamily: "'Inter', sans-serif",
+                        }}
+                      >
+                        Code
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontWeight: 600,
+                          backgroundColor: "#FAFAFA",
+                          fontFamily: "'Inter', sans-serif",
+                        }}
+                      >
+                        Alternate Code
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontWeight: 600,
+                          backgroundColor: "#FAFAFA",
+                          fontFamily: "'Inter', sans-serif",
+                        }}
+                      >
+                        Name
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontWeight: 600,
+                          backgroundColor: "#FAFAFA",
+                          fontFamily: "'Inter', sans-serif",
+                        }}
+                      >
+                        Description
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontWeight: 600,
+                          backgroundColor: "#FAFAFA",
+                          fontFamily: "'Inter', sans-serif",
+                        }}
+                      >
+                        UOM
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontWeight: 600,
+                          backgroundColor: "#FAFAFA",
+                          fontFamily: "'Inter', sans-serif",
+                        }}
+                      >
+                        Product Type
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontWeight: 600,
+                          backgroundColor: "#FAFAFA",
+                          fontFamily: "'Inter', sans-serif",
+                        }}
+                      >
+                        Category
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontWeight: 600,
+                          backgroundColor: "#FAFAFA",
+                          fontFamily: "'Inter', sans-serif",
+                        }}
+                      >
+                        Brand
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontWeight: 600,
+                          backgroundColor: "#FAFAFA",
+                          fontFamily: "'Inter', sans-serif",
+                        }}
+                      >
+                        Has Serial
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontWeight: 600,
+                          backgroundColor: "#FAFAFA",
+                          fontFamily: "'Inter', sans-serif",
+                        }}
+                      >
+                        Actions
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {currentProducts.length > 0 ? (
                       currentProducts.map((product) => (
                         <TableRow key={product.id} hover>
-                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>{product.code}</TableCell>
-                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>{product.alternate_code || "N/A"}</TableCell>
-                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>{product.name}</TableCell>
-                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>{product.description || "N/A"}</TableCell>
-                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>{product.uom || "N/A"}</TableCell>
-                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>{product.product_type || "N/A"}</TableCell>
-                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>{product.product_category || "N/A"}</TableCell>
-                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>{product.brand_name || "N/A"}</TableCell>
-                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>{product.has_serial ? "Yes" : "No"}</TableCell>
+                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>
+                            {product.code}
+                          </TableCell>
+                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>
+                            {product.alternate_code || "N/A"}
+                          </TableCell>
+                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>
+                            {product.name}
+                          </TableCell>
+                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>
+                            {product.description || "N/A"}
+                          </TableCell>
+                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>
+                            {product.uom || "N/A"}
+                          </TableCell>
+                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>
+                            {product.product_type || "N/A"}
+                          </TableCell>
+                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>
+                            {product.product_category || "N/A"}
+                          </TableCell>
+                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>
+                            {product.brand_name || "N/A"}
+                          </TableCell>
+                          <TableCell sx={{ fontFamily: "'Inter', sans-serif" }}>
+                            {product.has_serial ? "Yes" : "No"}
+                          </TableCell>
                           <TableCell>
                             <IconButton
                               onClick={() => handleEdit(product)}
@@ -503,7 +617,14 @@ const InvProducts = () => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={10} sx={{ textAlign: "center", fontFamily: "'Inter', sans-serif", color: "#6B7280" }}>
+                        <TableCell
+                          colSpan={10}
+                          sx={{
+                            textAlign: "center",
+                            fontFamily: "'Inter', sans-serif",
+                            color: "#6B7280",
+                          }}
+                        >
                           No products available
                         </TableCell>
                       </TableRow>
@@ -520,9 +641,10 @@ const InvProducts = () => {
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 sx={{
-                  "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
-                    fontFamily: "'Inter', sans-serif",
-                  },
+                  "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
+                    {
+                      fontFamily: "'Inter', sans-serif",
+                    },
                 }}
               />
             </Paper>
@@ -545,7 +667,9 @@ const InvProducts = () => {
             {isEdit ? "Edit Product" : "Add Product"}
           </DialogTitle>
           <DialogContent>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+            <Box
+              sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
+            >
               <TextField
                 label="Code"
                 name="code"
