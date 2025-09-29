@@ -101,7 +101,7 @@ const Organizations = () => {
     const fetchOrganizations = async () => {
       setLoading(true);
       try {
-        const response = await axios.get("${URL}/api/organization", {
+        const response = await axios.get(`${URL}/api/organization`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
@@ -123,21 +123,24 @@ const Organizations = () => {
   };
 
   // Compute organizations
-  const orgTypeData = organizations.reduce((acc, org) => {
-    if (org.org_type) {
-      const existing = acc.find((d) => d.name === org.org_type);
-      if (existing) {
-        existing.count += 1;
-      } else {
-        acc.push({
-          name: org.org_type,
-          count: 1,
-          color: getOrgTypeColor(org.org_type),
-        });
+  const orgTypeData = Array.isArray(organizations)
+  ? organizations.reduce((acc, org) => {
+      if (org.org_type) {
+        const existing = acc.find((d) => d.name === org.org_type);
+        if (existing) {
+          existing.count += 1;
+        } else {
+          acc.push({
+            name: org.org_type,
+            count: 1,
+            color: getOrgTypeColor(org.org_type),
+          });
+        }
       }
-    }
-    return acc;
-  }, []);
+      return acc;
+    }, [])
+  : [];
+
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -269,7 +272,7 @@ const Organizations = () => {
         );
       } else {
         const response = await axios.post(
-          "${URL}/api/organization",
+          `${URL}/api/organization`,
           payload,
           {
             headers: {
