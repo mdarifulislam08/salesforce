@@ -236,7 +236,7 @@ const CreatePurchaseOrder = () => {
     }
 
     try {
-      const response = await axios.get("${URL}/api/invproduct/search", {
+      const response = await axios.get(`${URL}/api/invproduct/search`, {
         params: { query: searchTerm },
         headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
       });
