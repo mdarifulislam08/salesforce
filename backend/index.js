@@ -70,6 +70,10 @@ app.get('/api/invproduct/:id', verifyToken, InvProductController.getInvProductBy
 app.put('/api/invproduct/:id', verifyToken, InvProductController.updateInvProduct);
 app.delete('/api/invproduct/:id', verifyToken, InvProductController.deleteInvProduct);
 
+// Health check route for Render
+app.get('/health', (req, res) => {
+  res.status(200).send('ok');
+});
 
 const PORT = process.env.PORT || 5000;
 
