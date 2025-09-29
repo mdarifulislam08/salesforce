@@ -14,31 +14,11 @@ const InvProductController = require('./Controllers/invProductController');
 const app = express();
 
 // Middleware
-// app.use(cors({ 
-//   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-//   credentials: true
-// }));
-// app.use(express.json());
-
-const allowedOrigins = [
-  process.env.FRONTEND_URL,            // your main production frontend
-  /\.vercel\.app$/                     // allow any vercel.app subdomain (regex)
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // allow non-browser tools (like Thunder Client)
-    if (allowedOrigins.some((o) => 
-        typeof o === 'string' ? o === origin : o.test(origin)
-    )) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+app.use(cors({ 
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
 }));
-
+app.use(express.json());
 
 
 // User routes
