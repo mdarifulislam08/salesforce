@@ -118,10 +118,10 @@ const PurchaseOrders = () => {
           throw new Error("No authentication token found");
         }
         const [orgResponse, productResponse] = await Promise.all([
-          axios.get("${URL}/api/organization", {
+          axios.get(`${URL}/api/organization`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("${URL}/api/invproduct", {
+          axios.get(`${URL}/api/invproduct`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -148,7 +148,7 @@ const PurchaseOrders = () => {
   const fetchPurchaseOrders = async (pageNum, limit = 25) => {
     setLoading(true);
     try {
-      const response = await axios.get("${URL}/api/purchaseorder", {
+      const response = await axios.get(`${URL}/api/purchaseorder`, {
         params: { page: pageNum, limit },
         headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
       });
@@ -169,7 +169,7 @@ const PurchaseOrders = () => {
   const searchPurchaseOrders = async (query, pageNum, limit = 25) => {
     setSearchLoading(true);
     try {
-      const response = await axios.get("${URL}/api/purchaseorder/search", {
+      const response = await axios.get(`${URL}/api/purchaseorder/search`, {
         params: { query, page: pageNum, limit },
         headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
       });
@@ -402,14 +402,14 @@ const PurchaseOrders = () => {
     const formatDate = (date) => (date ? new Date(date).toLocaleDateString() : "N/A");
 
     // Fetch all purchase orders with large limit
-    const poResponse = await axios.get("${URL}/api/purchaseorder", {
+    const poResponse = await axios.get(`${URL}/api/purchaseorder`, {
       params: { page: 1, limit: 1000 },
       headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
     });
     const exportPurchaseOrders = Array.isArray(poResponse.data.purchaseOrders) ? poResponse.data.purchaseOrders : [];
 
     // Fetch all purchase order details at once (no filter)
-    const detailsResponse = await axios.get("${URL}/api/purchaseorderdetail", {
+    const detailsResponse = await axios.get(`${URL}/api/purchaseorderdetail`, {
       headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
     });
     const allDetails = Array.isArray(detailsResponse.data) ? detailsResponse.data : [];
